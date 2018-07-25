@@ -11,14 +11,14 @@ import skipthoughts
 import decoder
 import embedding
 
-import config
+from config import FLAG_CPU_MODE, paths
 
 import lasagne
 from lasagne.layers import InputLayer, DenseLayer, NonlinearityLayer, DropoutLayer
 from lasagne.layers import MaxPool2DLayer as PoolLayer
 from lasagne.nonlinearities import softmax
 from lasagne.utils import floatX
-if not config.FLAG_CPU_MODE:
+if not FLAG_CPU_MODE:
     from lasagne.layers.corrmm import Conv2DMMLayer as ConvLayer
 
 from scipy import optimize, stats
@@ -78,39 +78,39 @@ def load_all():
     """
     Load everything we need for generating
     """
-    print(config.paths['decmodel'])
+    print(paths['decmodel'])
 
     # Skip-thoughts
     print('Loading skip-thoughts...')
-    stv = skipthoughts.load_model(config.paths['skmodels'],
-                                  config.paths['sktables'])
+    stv = skipthoughts.load_model(paths['skmodels'],
+                                  paths['sktables'])
 
     # Decoder
     print('Loading decoder...')
-    dec = decoder.load_model(config.paths['decmodel'],
-                             config.paths['dictionary'])
+    dec = decoder.load_model(paths['decmodel'],
+                             paths['dictionary'])
 
     # Image-sentence embedding
     print('Loading image-sentence embedding...')
-    vse = embedding.load_model(config.paths['vsemodel'])
+    vse = embedding.load_model(paths['vsemodel'])
 
     # VGG-19
     print('Loading and initializing ConvNet...')
 
-    if config.FLAG_CPU_MODE:
-        sys.path.insert(0, config.paths['pycaffe'])
+    if FLAG_CPU_MODE:
+        sys.path.insert(0, paths['pycaffe'])
         import caffe
         caffe.set_mode_cpu()
-        net = caffe.Net(config.paths['vgg_proto_caffe'],
-                        config.paths['vgg_model_caffe'],
+        net = caffe.Net(paths['vgg_proto_caffe'],
+                        paths['vgg_model_caffe'],
                         caffe.TEST)
     else:
-        net = build_convnet(config.paths['vgg'])
+        net = build_convnet(paths['vgg'])
 
     # Captions
     print('Loading captions...')
     cap = []
-    with open(config.paths['captions'], 'rb') as f:
+    with open(paths['captions'], 'rb') as f:
         for line in f:
             cap.append(line.strip())
 
@@ -120,8 +120,8 @@ def load_all():
 
     # Biases
     print('Loading biases...')
-    bneg = numpy.load(config.paths['negbias'])
-    bpos = numpy.load(config.paths['posbias'])
+    bneg = numpy.load(paths['negbias'])
+    bpos = numpy.load(paths['posbias'])
 
     # Pack up
     z = {}
@@ -173,7 +173,7 @@ def compute_features(net, im):
     """
     Compute fc7 features for im
     """
-    if config.FLAG_CPU_MODE:
+    if FLAG_CPU_MODE:
         net.blobs['data'].reshape(* im.shape)
         net.blobs['data'].data[...] = im
         net.forward()
