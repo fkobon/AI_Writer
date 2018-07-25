@@ -9,10 +9,12 @@ This code will generate a story based on an image that you input. More informati
 [Samim](http://samim.io/) has made an awesome blog post with lots of results [here](https://medium.com/@samim/generating-stories-about-images-d163ba41e4ed).
 
 
+## This is fork for Python 3.6+
+
 Dependencies
 ============
 
-* Python 2.7 - (https://www.python.org/downloads/)
+* Python 3.6 - (https://www.python.org/downloads/)
 * Theano - instructions [here](http://deeplearning.net/software/theano/install.html)
 * lasagne - instructions [here](http://lasagne.readthedocs.io/en/latest/user/installation.html)
 * scipy `pip install scipy `

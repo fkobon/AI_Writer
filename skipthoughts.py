@@ -6,7 +6,7 @@ import os
 import theano
 import theano.tensor as tensor
 
-import cPickle as pkl
+import pickle as pkl
 import numpy
 import copy
 import nltk
@@ -70,8 +70,8 @@ def load_tables(path_to_tables):
     for line in f:
         words.append(line.decode('utf-8').strip())
     f.close()
-    utable = OrderedDict(zip(words, utable))
-    btable = OrderedDict(zip(words, btable))
+    utable = OrderedDict(list(zip(words, utable)))
+    btable = OrderedDict(list(zip(words, btable)))
     return utable, btable
 
 def encode(model, X, use_norm=True, verbose=True, batch_size=128, use_eos=False):
@@ -83,7 +83,7 @@ def encode(model, X, use_norm=True, verbose=True, batch_size=128, use_eos=False)
 
     # word dictionary and init
     d = defaultdict(lambda : 0)
-    for w in model['utable'].keys():
+    for w in list(model['utable'].keys()):
         d[w] = 1
     ufeatures = numpy.zeros((len(X), model['uoptions']['dim']), dtype='float32')
     bfeatures = numpy.zeros((len(X), 2 * model['boptions']['dim']), dtype='float32')
@@ -95,9 +95,9 @@ def encode(model, X, use_norm=True, verbose=True, batch_size=128, use_eos=False)
         ds[len(s)].append(i)
 
     # Get features. This encodes by length, in order to avoid wasting computation
-    for k in ds.keys():
+    for k in list(ds.keys()):
         if verbose:
-            print k
+            print(k)
         numbatches = len(ds[k]) / batch_size + 1
         for minibatch in range(numbatches):
             caps = ds[k][minibatch::numbatches]
@@ -163,7 +163,7 @@ def init_tparams(params):
     initialize Theano shared variables according to the initial parameters
     """
     tparams = OrderedDict()
-    for kk, pp in params.iteritems():
+    for kk, pp in params.items():
         tparams[kk] = theano.shared(params[kk], name=kk)
     return tparams
 
@@ -172,7 +172,7 @@ def load_params(path, params):
     load parameters
     """
     pp = numpy.load(path)
-    for kk, vv in params.iteritems():
+    for kk, vv in params.items():
         if kk not in pp:
             warnings.warn('%s is not in the archive'%kk)
             continue

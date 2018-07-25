@@ -1,0 +1,5 @@
+numpy
+scipy
+git+https://github.com/Lasagne/Lasagne
+theano
+scikit-image
